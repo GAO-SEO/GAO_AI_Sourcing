@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { SanitizedData } from '../types';
-import { sanitizeDocument } from '../services/sanitizationService';
+import { sanitizeDocument } from '../services/SanitizationService';
 import { generateSanitizedDocxBlob } from '../services/documentService';
 import Loader from './Loader';
 import { AlertTriangleIcon, UploadCloudIcon, FileTextIcon } from './Icons';
