@@ -14,7 +14,11 @@ const formatDataForTxt = (data: ProductData): string => {
   content += `=========================\n\n`;
   content += `Product ID: ${data.productId}\n`;
   content += `Product Name: ${data.productName}\n`;
-  content += `Category: ${data.category}\n\n`;
+  content += `Category: ${data.category}\n`;
+  if (data.productLink) {
+    content += `Product Link: ${data.productLink}\n`;
+  }
+  content += `\n`;
 
   if (data.prices && data.prices.length > 0) {
     content += `--- PRICING ---\n`;
@@ -96,6 +100,30 @@ const ProductDataDisplay: React.FC<ProductDataDisplayProps> = ({ product, onUpda
     setEditedData(prev => ({ ...prev, [listName]: newList }));
   };
 
+  const handleAddCustomSection = () => {
+    const newSection = { id: crypto.randomUUID(), title: 'New Section', content: '' };
+    setEditedData(prev => ({
+        ...prev,
+        customSections: [...(prev.customSections || []), newSection]
+    }));
+  };
+
+  const handleDeleteCustomSection = (id: string) => {
+    setEditedData(prev => ({
+        ...prev,
+        customSections: (prev.customSections || []).filter(section => section.id !== id)
+    }));
+  };
+
+  const handleCustomSectionChange = (id: string, field: 'title' | 'content', value: string) => {
+    setEditedData(prev => ({
+        ...prev,
+        customSections: (prev.customSections || []).map(section =>
+            section.id === id ? { ...section, [field]: value } : section
+        )
+    }));
+  };
+
   const handleCopyToClipboard = useCallback(() => {
     const textToCopy = formatDataForTxt(editedData);
     navigator.clipboard.writeText(textToCopy).then(() => {
@@ -111,21 +139,31 @@ const ProductDataDisplay: React.FC<ProductDataDisplayProps> = ({ product, onUpda
     <div className="w-full max-w-4xl mx-auto bg-brand-surface rounded-lg shadow-2xl p-6 sm:p-8 animate-fade-in">
       <div className="flex justify-between items-start mb-6 gap-4">
         <div className="flex-1">
-            <p className="text-sm text-brand-text-secondary">
-              {isEditing ? (
-                <div className="flex gap-2">
-                  <input type="text" name="productId" value={editedData.productId} onChange={handleInputChange} className={inputClass} placeholder="Product ID" />
-                  <input type="text" name="category" value={editedData.category} onChange={handleInputChange} className={inputClass} placeholder="Category" />
-                </div>
-              ) : (
-                <>{editedData.productId} • {editedData.category}</>
-              )}
-            </p>
-            {isEditing ? (
-              <textarea name="productName" value={editedData.productName} onChange={handleInputChange} className={`${textareaClass} mt-1 text-2xl sm:text-3xl font-bold`} placeholder="Product Name" />
-            ) : (
+          {isEditing ? (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input type="text" name="productId" value={editedData.productId} onChange={handleInputChange} className={inputClass} placeholder="Product ID" />
+                <input type="text" name="category" value={editedData.category} onChange={handleInputChange} className={inputClass} placeholder="Category" />
+              </div>
+              <textarea name="productName" value={editedData.productName} onChange={handleInputChange} className={`${textareaClass} text-2xl sm:text-3xl font-bold`} placeholder="Product Name" />
+              <input type="url" name="productLink" value={editedData.productLink || ''} onChange={handleInputChange} className={inputClass} placeholder="Product Link" />
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-brand-text-secondary">
+                {editedData.productId} • {editedData.category}
+              </p>
               <h1 className="text-2xl sm:text-3xl font-bold text-brand-text-primary mt-1">{editedData.productName}</h1>
-            )}
+              {editedData.productLink && (
+                <div className="mt-2">
+                  <a href={editedData.productLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 hover:underline break-all inline-flex items-center gap-1.5">
+                    <span className="truncate">{editedData.productLink}</span>
+                    <ExternalLinkIcon className="w-4 h-4 flex-shrink-0" />
+                  </a>
+                </div>
+              )}
+            </>
+          )}
         </div>
         <div className="flex space-x-2 flex-shrink-0">
           {isEditing ? (
@@ -246,6 +284,59 @@ const ProductDataDisplay: React.FC<ProductDataDisplayProps> = ({ product, onUpda
             </div>
           </div>
         ) : null}
+
+        {/* CUSTOM SECTIONS */}
+        {(editedData.customSections || []).map((section) => (
+            <div key={section.id}>
+                {isEditing ? (
+                    <div className="space-y-2 p-4 border border-dashed border-brand-secondary rounded-lg relative mt-8">
+                        <button 
+                            onClick={() => handleDeleteCustomSection(section.id)} 
+                            className="absolute top-2 right-2 p-2 text-brand-text-secondary hover:text-red-400 transition-colors" 
+                            aria-label="Delete custom section"
+                        >
+                            <TrashIcon className="w-5 h-5" />
+                        </button>
+                        <label htmlFor={`custom-title-${section.id}`} className="block text-sm font-medium text-brand-text-primary">Custom Section Heading</label>
+                        <input 
+                            id={`custom-title-${section.id}`}
+                            type="text" 
+                            value={section.title} 
+                            onChange={(e) => handleCustomSectionChange(section.id, 'title', e.target.value)} 
+                            className={`${inputClass} text-lg font-semibold`} 
+                            placeholder="Section Title" 
+                        />
+                         <label htmlFor={`custom-content-${section.id}`} className="block text-sm font-medium text-brand-text-primary pt-2">Custom Section Content</label>
+                        <textarea 
+                            id={`custom-content-${section.id}`}
+                            value={section.content} 
+                            onChange={(e) => handleCustomSectionChange(section.id, 'content', e.target.value)} 
+                            className={textareaClass} 
+                            placeholder="Section content. You can create lists by starting lines with a hyphen (-)." 
+                        />
+                    </div>
+                ) : (
+                    section.title && section.content && (
+                        <div>
+                            <h2 className="text-xl font-semibold text-brand-accent border-b-2 border-brand-accent/30 pb-2 mb-4">{section.title}</h2>
+                            <p className="text-brand-text-secondary leading-relaxed whitespace-pre-wrap">{section.content}</p>
+                        </div>
+                    )
+                )}
+            </div>
+        ))}
+        
+        {isEditing && (
+            <div className="mt-8 pt-6 border-t border-brand-secondary/50 text-center">
+                <button 
+                    onClick={handleAddCustomSection} 
+                    className="flex items-center justify-center mx-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-surface focus:ring-indigo-500"
+                >
+                    <PencilIcon className="w-4 h-4 mr-2" />
+                    Add Custom Section
+                </button>
+            </div>
+        )}
 
         {product.sources && product.sources.length > 0 && !isEditing && (
           <div>

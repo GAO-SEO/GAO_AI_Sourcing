@@ -1,4 +1,5 @@
 
+
 import * as docx from 'docx';
 import { ProcessedProduct, ProductData, SanitizedData } from '../types';
 
@@ -12,9 +13,27 @@ const createProductSection = (data: ProductData): (docx.Paragraph | docx.Table)[
         }),
         new Paragraph({
             children: [new TextRun({ text: `Product ID: ${data.productId} • Category: ${data.category}`, size: 22, font: "Calibri", color: "595959" })],
-            spacing: { after: 400 },
+            spacing: { after: 200 },
         }),
     ];
+
+    if (data.productLink) {
+        children.push(new Paragraph({
+            children: [
+                new TextRun({ text: `Product Link: `, size: 22, font: "Calibri", color: "595959" }),
+                new docx.ExternalHyperlink({
+                    link: data.productLink,
+                    children: [
+                        new TextRun({
+                            text: data.productLink,
+                            style: "Hyperlink",
+                        }),
+                    ],
+                }),
+            ],
+            spacing: { after: 400 },
+        }));
+    }
 
     if (data.prices && data.prices.length > 0) {
         children.push(new Paragraph({ text: "Pricing", heading: HeadingLevel.HEADING_2, spacing: { before: 200, after: 200 } }));
@@ -73,6 +92,15 @@ const createProductSection = (data: ProductData): (docx.Paragraph | docx.Table)[
         children.push(specTable);
     }
 
+    if (data.customSections && data.customSections.length > 0) {
+        data.customSections.forEach(section => {
+            if (section.title && section.content) {
+                children.push(new Paragraph({ text: section.title, heading: HeadingLevel.HEADING_2, spacing: { before: 400, after: 200 } }));
+                children.push(new Paragraph({ text: section.content, style: "Normal" }));
+            }
+        });
+    }
+
     return children;
 };
 
@@ -91,7 +119,8 @@ export const generateCombinedDocxBlob = (products: ProcessedProduct[]): Promise<
         styles: {
             paragraphStyles: [
                 { id: "Normal", name: "Normal", run: { font: "Calibri", size: 22 } },
-                { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", run: { font: "Calibri", size: 26, bold: true, color: "2E74B5" } }
+                { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", run: { font: "Calibri", size: 26, bold: true, color: "2E74B5" } },
+                { id: "Hyperlink", name: "Hyperlink", basedOn: "Normal", run: { color: "0563C1", underline: { type: docx.UnderlineType.SINGLE } } }
             ]
         },
         sections: [{ children: allChildren }],
@@ -166,6 +195,15 @@ const createSanitizedSection = (data: SanitizedData): (docx.Paragraph | docx.Tab
             }
         });
         children.push(specTable);
+    }
+
+    if (data.customSections && data.customSections.length > 0) {
+        data.customSections.forEach(section => {
+            if (section.title && section.content) {
+                children.push(new Paragraph({ text: section.title, heading: HeadingLevel.HEADING_2, spacing: { before: 400, after: 200 } }));
+                children.push(new Paragraph({ text: section.content, style: "Normal" }));
+            }
+        });
     }
 
     return children;

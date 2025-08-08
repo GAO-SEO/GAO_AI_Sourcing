@@ -1,4 +1,5 @@
 
+
 export interface Specification {
   key: string;
   value: string;
@@ -13,11 +14,13 @@ export interface ProductData {
   productName: string;
   productId: string;
   category: string;
+  productLink?: string;
   prices: PriceTier[];
   overview: string;
   metaDescription: string;
   features: string[];
   specifications: Specification[];
+  customSections?: CustomSection[];
 }
 
 export interface Source {
@@ -31,6 +34,12 @@ export interface ProcessedProduct {
   sources: Source[];
 }
 
+export interface CustomSection {
+  id: string;
+  title: string;
+  content: string;
+}
+
 export interface SanitizedData {
   productName: string;
   productId: string;
@@ -38,4 +47,5 @@ export interface SanitizedData {
   overview: string;
   features: string[];
   specifications: Specification[];
+  customSections?: CustomSection[];
 }
