@@ -127,7 +127,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="w-full max-w-4xl text-center mt-12 text-brand-text-secondary text-sm">
-        <p>&copy; {new Date().getFullYear()} GAO AI Tools. Powered by Gemini.</p>
+        <p>&copy; {new Date().getFullYear()} AI Sourcing & Sanitization. Powered by GAO.</p>
       </footer>
     </div>
   );
