@@ -1,3 +1,4 @@
+
 export interface Specification {
   key: string;
   value: string;
@@ -28,4 +29,13 @@ export interface ProcessedProduct {
   id: string; // Unique client-side ID for list management
   data: ProductData;
   sources: Source[];
+}
+
+export interface SanitizedData {
+  productName: string;
+  productId: string;
+  productLink: string;
+  overview: string;
+  features: string[];
+  specifications: Specification[];
 }
