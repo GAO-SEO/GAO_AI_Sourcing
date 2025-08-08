@@ -12,13 +12,13 @@ interface ProductDataDisplayProps {
 const formatDataForTxt = (data: ProductData): string => {
   let content = `GAOTEK PRODUCT DATA SHEET\n`;
   content += `=========================\n\n`;
-  content += `Product ID: ${data.productId}\n`;
+
   content += `Product Name: ${data.productName}\n`;
-  content += `Category: ${data.category}\n`;
+  content += `Product ID: ${data.productId}\n`;
   if (data.productLink) {
     content += `Product Link: ${data.productLink}\n`;
   }
-  content += `\n`;
+  content += `Category: ${data.category}\n\n`;
 
   if (data.prices && data.prices.length > 0) {
     content += `--- PRICING ---\n`;
@@ -137,31 +137,43 @@ const ProductDataDisplay: React.FC<ProductDataDisplayProps> = ({ product, onUpda
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-brand-surface rounded-lg shadow-2xl p-6 sm:p-8 animate-fade-in">
-      <div className="flex justify-between items-start mb-6 gap-4">
-        <div className="flex-1">
+      <div className="flex justify-between items-center mb-6 gap-4">
+        <div className="flex-1 min-w-0">
           {isEditing ? (
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input type="text" name="productId" value={editedData.productId} onChange={handleInputChange} className={inputClass} placeholder="Product ID" />
-                <input type="text" name="category" value={editedData.category} onChange={handleInputChange} className={inputClass} placeholder="Category" />
+            <div className="space-y-4">
+              <div>
+                  <label htmlFor={`${product.id}-productName`} className="sr-only">Product Name</label>
+                  <textarea id={`${product.id}-productName`} name="productName" value={editedData.productName} onChange={handleInputChange} className={`${textareaClass} text-2xl sm:text-3xl font-bold p-2`} placeholder="Product Name" />
               </div>
-              <textarea name="productName" value={editedData.productName} onChange={handleInputChange} className={`${textareaClass} text-2xl sm:text-3xl font-bold`} placeholder="Product Name" />
-              <input type="url" name="productLink" value={editedData.productLink || ''} onChange={handleInputChange} className={inputClass} placeholder="Product Link" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                      <label htmlFor={`${product.id}-productId`} className="block text-sm font-medium text-brand-text-secondary mb-1">Product ID</label>
+                      <input id={`${product.id}-productId`} type="text" name="productId" value={editedData.productId} onChange={handleInputChange} className={inputClass} placeholder="Product ID" />
+                  </div>
+                  <div>
+                      <label htmlFor={`${product.id}-category`} className="block text-sm font-medium text-brand-text-secondary mb-1">Category</label>
+                      <input id={`${product.id}-category`} type="text" name="category" value={editedData.category} onChange={handleInputChange} className={inputClass} placeholder="Category" />
+                  </div>
+              </div>
+              <div>
+                  <label htmlFor={`${product.id}-productLink`} className="block text-sm font-medium text-brand-text-secondary mb-1">Product Link</label>
+                  <input id={`${product.id}-productLink`} type="url" name="productLink" value={editedData.productLink || ''} onChange={handleInputChange} className={inputClass} placeholder="Product Link" />
+              </div>
             </div>
           ) : (
             <>
-              <p className="text-sm text-brand-text-secondary">
-                {editedData.productId} • {editedData.category}
-              </p>
-              <h1 className="text-2xl sm:text-3xl font-bold text-brand-text-primary mt-1">{editedData.productName}</h1>
-              {editedData.productLink && (
-                <div className="mt-2">
-                  <a href={editedData.productLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 hover:underline break-all inline-flex items-center gap-1.5">
-                    <span className="truncate">{editedData.productLink}</span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-brand-text-primary break-words">{editedData.productName}</h1>
+              <div className="flex items-center gap-x-4 gap-y-2 flex-wrap mt-2">
+                <p className="text-sm text-brand-text-secondary">
+                  {editedData.productId} • {editedData.category}
+                </p>
+                {editedData.productLink && (
+                  <a href={editedData.productLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 hover:underline inline-flex items-center gap-1.5 min-w-0">
                     <ExternalLinkIcon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{editedData.productLink}</span>
                   </a>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
         </div>
