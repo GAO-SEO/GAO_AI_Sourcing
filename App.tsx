@@ -97,7 +97,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-4xl mb-8">
         <div className="flex border-b border-brand-surface/50">
           <TabButton isActive={activeTab === 'sourcing'} onClick={() => setActiveTab('sourcing')}>
-            AI Sourcing
+            Sourcing
           </TabButton>
           <TabButton isActive={activeTab === 'sanitization'} onClick={() => setActiveTab('sanitization')}>
             Sanitization
