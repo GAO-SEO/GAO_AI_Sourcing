@@ -1,0 +1,6 @@
+{
+  "name": "GAO AI Sourcing",
+  "description": "An AI-powered tool to process and format raw product data. Paste text describing a product to receive a structured, standardized output with generated names, overviews, and converted technical specifications.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
